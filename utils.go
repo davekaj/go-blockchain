@@ -6,15 +6,6 @@ import (
 	"log"
 )
 
-// //IntToHex turns a int into its hexidecimal byte representation
-// func IntToHex(i int64) []byte {
-// 	hexRepresentation := strconv.FormatInt(i, 16)
-
-// 	byteArray := []byte(hexRepresentation)
-
-// 	return byteArray
-// }
-
 // IntToHex converts an int64 to a byte array
 func IntToHex(num int64) []byte {
 	buff := new(bytes.Buffer)
@@ -24,4 +15,11 @@ func IntToHex(num int64) []byte {
 	}
 
 	return buff.Bytes()
+}
+
+// ReverseBytes reverses a byte array
+func ReverseBytes(data []byte) {
+	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+		data[i], data[j] = data[j], data[i]
+	}
 }

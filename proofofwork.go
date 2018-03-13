@@ -8,15 +8,19 @@ import (
 	"math/big"
 )
 
+var (
+	maxNonce = math.MaxInt64
+)
+
 const targetBits = 24
 
-//ProofOfWork comment
+// ProofOfWork represents a proof-of-work
 type ProofOfWork struct {
 	block  *Block
 	target *big.Int
 }
 
-//NewProofOfWork comment
+// NewProofOfWork builds and returns a ProofOfWork
 func NewProofOfWork(b *Block) *ProofOfWork {
 	target := big.NewInt(1)
 	target.Lsh(target, uint(256-targetBits))
@@ -30,29 +34,27 @@ func (pow *ProofOfWork) prepareData(nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
 			pow.block.PrevBlockHash,
-			pow.block.Data,
+			pow.block.HashTransactions(),
 			IntToHex(pow.block.Timestamp),
 			IntToHex(int64(targetBits)),
 			IntToHex(int64(nonce)),
 		},
 		[]byte{},
 	)
+
 	return data
 }
 
-//is this okay???????
-var maxNonce = math.MaxInt64
-
-//Run comment
+// Run performs a proof-of-work
 func (pow *ProofOfWork) Run() (int, []byte) {
 	var hashInt big.Int
 	var hash [32]byte
 	nonce := 0
 
-	fmt.Printf("Mining the block containing \"%s\"\n", pow.block.Data)
-
+	fmt.Printf("Mining a new block")
 	for nonce < maxNonce {
 		data := pow.prepareData(nonce)
+
 		hash = sha256.Sum256(data)
 		fmt.Printf("\r%x", hash)
 		hashInt.SetBytes(hash[:])
@@ -66,10 +68,9 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	fmt.Print("\n\n")
 
 	return nonce, hash[:]
-
 }
 
-//Validate comment
+// Validate validates block's PoW
 func (pow *ProofOfWork) Validate() bool {
 	var hashInt big.Int
 
